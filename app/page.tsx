@@ -133,7 +133,13 @@ export default function Home() {
         onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
-        files={filteredFiles}
+        files={filteredFiles.map((file) => ({
+          ...file,
+          draggable: true,
+          onDragStart: (e: React.DragEvent<HTMLLIElement>) => {
+            e.dataTransfer.setData("text/plain", file.name)
+          },
+        }))}
         selectedFile={selectedFile}
         hoveredFile={hoveredFile}
         hoverPosition={hoverPosition}
@@ -152,7 +158,24 @@ export default function Home() {
       />
 
       {/* Middle Content Area */}
-      <div className={`flex-1 border-r border-gray-200 dark:border-[#454545] p-4 transition-all duration-300 ease-in-out ${sidebarCollapsed ? 'w-1/2' : ''}`}>
+      <div
+        className={`flex-1 border-r border-gray-200 dark:border-[#454545] p-4 transition-all duration-300 ease-in-out ${sidebarCollapsed ? 'w-1/2' : ''}`}
+        onDragOver={(e) => e.preventDefault()}
+        onDrop={(e) => {
+          e.preventDefault()
+          const fileName = e.dataTransfer.getData("text/plain")
+          if (fileName && deletedTimelineItems.includes(fileName)) {
+            const file = uploadedFiles.find((f) => f.name === fileName)
+            if (file && file.status === "completed") {
+              // console.log(fileName)
+              setTimelineItems((prev) => [...prev, fileName])
+              setDeletedTimelineItems((prev) => prev.filter((name) => name !== fileName))
+              console.log(timelineItems)
+              console.log(deletedTimelineItems)
+            }
+          }
+        }}
+      >
         <div className="h-full flex flex-col bg-white dark:bg-[#3A3A3A] rounded-lg shadow-sm">
           <div className="flex-1 overflow-auto">
             {uploadedFiles.length > 0 ? (

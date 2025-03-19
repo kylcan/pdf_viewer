@@ -63,6 +63,10 @@ export function FileList({
             <ContextMenuTrigger className="context-menu-trigger">
               <li
                 className="relative group"
+                draggable={true}
+                onDragStart={(e: React.DragEvent<HTMLLIElement>) => {
+                  e.dataTransfer.setData("text/plain", file.name)
+                }}
                 onMouseEnter={(e) => {
                   if (!e.currentTarget.querySelector('[data-state="open"]')) {
                     onMouseEnter(file.name, e)
