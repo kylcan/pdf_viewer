@@ -27,6 +27,7 @@ export default function Home() {
   const { translations } = useSettings()
   const [showClusterButton, setShowClusterButton] = useState(false)
   const [timelineItems, setTimelineItems] = useState<string[]>([])
+  const [deletedTimelineItems, setDeletedTimelineItems] = useState<string[]>([])
 
   const { uploadedFiles, processFiles, handleDeleteFile, handleReupload } = useFileUpload()
 
@@ -107,7 +108,8 @@ export default function Home() {
   }
 
   const handleDeleteTimelineItem = (fileName: string) => {
-    setTimelineItems(prev => prev.filter(name => name !== fileName))
+    setDeletedTimelineItems((prev) => [...prev, fileName])
+    setTimelineItems((prev) => prev.filter((name) => name !== fileName))
   }
 
   const filteredFiles = uploadedFiles.filter((file) => file.name.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -156,8 +158,11 @@ export default function Home() {
             {uploadedFiles.length > 0 ? (
               <div className="p-6">
                 <DocumentTimeline
-                  files={uploadedFiles.filter((file) => 
-                    file.status === "completed" && timelineItems.includes(file.name)
+                  files={uploadedFiles.filter(
+                    (file) =>
+                      file.status === "completed" &&
+                      timelineItems.includes(file.name) &&
+                      !deletedTimelineItems.includes(file.name)
                   )}
                   selectedFile={selectedFile}
                   onSelectFile={(file) => {
