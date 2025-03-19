@@ -62,17 +62,23 @@ export function FileList({
           <ContextMenu key={file.name}>
             <ContextMenuTrigger className="context-menu-trigger">
               <li
-                className="relative group"
+                key={file.name}
                 draggable={true}
                 onDragStart={(e: React.DragEvent<HTMLLIElement>) => {
                   e.dataTransfer.setData("text/plain", file.name)
+                  const target = e.currentTarget
+                  e.dataTransfer.setDragImage(target, 0, 0)
                 }}
+                className="relative group"
                 onMouseEnter={(e) => {
                   if (!e.currentTarget.querySelector('[data-state="open"]')) {
                     onMouseEnter(file.name, e)
                   }
                 }}
                 onMouseLeave={onMouseLeave}
+                onMouseDown={() => {
+                  onMouseLeave()
+                }}
               >
                 <div
                   className={`flex flex-col p-2 rounded cursor-pointer hover:bg-gray-200 dark:hover:bg-[#454545] ${
