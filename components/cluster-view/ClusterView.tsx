@@ -9,40 +9,44 @@ interface ClusterViewProps {
 }
 
 export function ClusterView({ files, fileCategories, selectedFile, onSelectFile }: ClusterViewProps) {
-  // 按类别对文件进行分组
+  // 按类别对文件进行分组，并在每个类别内按时间排序
   const groupedFiles = files.reduce((acc, file) => {
     const category = fileCategories[file.name] || "未分类"
     if (!acc[category]) {
       acc[category] = []
     }
     acc[category].push(file)
+    // 确保每个类别的文件按时间排序
+    acc[category].sort((a, b) => {
+      const dateA = a.releaseDate?.getTime() || 0
+      const dateB = b.releaseDate?.getTime() || 0
+      return dateB - dateA // 降序排列（新的在前）
+    })
     return acc
   }, {} as { [key: string]: PdfFile[] })
 
   // 为每个类别定义不同的颜色
   const categoryColors: { [key: string]: string } = {
-    "1": "bg-blue-100 border-blue-300",
-    "2": "bg-green-100 border-green-300",
-    "3": "bg-yellow-100 border-yellow-300",
-    "未分类": "bg-gray-100 border-gray-300"
+    "1": "bg-blue-100 border-blue-200",
+    "2": "bg-green-100 border-green-200",
+    "3": "bg-yellow-100 border-yellow-200",
+    "未分类": "bg-gray-100 border-gray-200"
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="space-y-6">
       {Object.entries(groupedFiles).map(([category, categoryFiles]) => (
         <div key={category} className="space-y-3">
           <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
             Category {category}
           </h3>
-          <div className="space-y-2">
-            {categoryFiles.map((file) => (
+          <div className={`rounded-lg border ${categoryColors[category] || "bg-gray-50 border-gray-200"}`}>
+            {categoryFiles.map((file, index) => (
               <div
                 key={file.name}
-                className={`p-4 rounded-lg border ${
-                  categoryColors[category] || "bg-gray-100 border-gray-300"
-                } cursor-pointer transition-colors duration-200 hover:bg-opacity-80 ${
-                  selectedFile?.name === file.name ? "bg-opacity-50" : ""
-                }`}
+                className={`p-4 cursor-pointer transition-colors duration-200 hover:bg-black/5 ${
+                  selectedFile?.name === file.name ? "bg-black/10" : ""
+                } ${index !== 0 ? "border-t border-inherit" : ""}`}
                 onClick={() => onSelectFile(selectedFile?.name === file.name ? null : file)}
               >
                 <div className="flex items-center space-x-3">
