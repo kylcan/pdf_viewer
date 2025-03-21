@@ -13,9 +13,10 @@ interface DocumentTimelineProps {
   selectedFile: PdfFile | null //当前选中的文件
   onSelectFile: (file: PdfFile | null) => void //点击文件时触发
   onDeleteTimelineItem?: (fileName: string) => void
+  fileCategories?: { [key: string]: string }
 }
 
-export function DocumentTimeline({ files, selectedFile, onSelectFile, onDeleteTimelineItem }: DocumentTimelineProps) {
+export function DocumentTimeline({ files, selectedFile, onSelectFile, onDeleteTimelineItem, fileCategories }: DocumentTimelineProps) {
   const [timelineItems, setTimelineItems] = useState<TimelineItem[]>([])
   const { translations } = useSettings()
 

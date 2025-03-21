@@ -26,6 +26,7 @@ interface SidebarProps {
   onDragLeave: (e: React.DragEvent<HTMLDivElement>) => void
   onDrop: (e: React.DragEvent<HTMLDivElement>) => void
   onClick: (e: React.MouseEvent<HTMLDivElement>) => void
+  onClusterButton: () => void
 }
 
 export function Sidebar({
@@ -49,6 +50,7 @@ export function Sidebar({
   onDragLeave,
   onDrop,
   onClick,
+  onClusterButton,
 }: SidebarProps) {
   const { theme } = useSettings()
 

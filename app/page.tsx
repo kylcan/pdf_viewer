@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button"
 import { Sidebar } from "@/components/sidebar/Sidebar"
 import { useFileUpload } from "@/hooks/useFileUpload"
 import { ContentFooter } from "@/components/content/ContentFooter"
+import { ClusterView } from "@/components/cluster-view/ClusterView"
 
 export default function Home() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
@@ -28,6 +29,9 @@ export default function Home() {
   const [showClusterButton, setShowClusterButton] = useState(false)
   const [timelineItems, setTimelineItems] = useState<string[]>([])
   const [deletedTimelineItems, setDeletedTimelineItems] = useState<string[]>([])
+  const [fileCategories, setFileCategories] = useState<{ [key: string]: string }>({})
+  const [showClusterView, setShowClusterView] = useState(false)
+  const [isClusterLoading, setIsClusterLoading] = useState(false)
 
   const { uploadedFiles, processFiles, handleDeleteFile, handleReupload } = useFileUpload()
 
@@ -103,8 +107,24 @@ export default function Home() {
     setManualInputOpen(false)
   }
 
-  const handleClusterClick = () => {
-    console.log("Clustering documents...")
+  const handleClusterClick = async () => {
+    setIsClusterLoading(true)
+    
+    // 模拟后端分析过程
+    await new Promise(resolve => setTimeout(resolve, 1500))
+    
+    // 随机分配类别
+    const categories = ["1", "2", "3"]
+    const newCategories = uploadedFiles.reduce((acc, file) => {
+      if (file.status === "completed") {
+        acc[file.name] = categories[Math.floor(Math.random() * categories.length)]
+      }
+      return acc
+    }, {} as { [key: string]: string })
+
+    setFileCategories(newCategories)
+    setShowClusterView(true)
+    setIsClusterLoading(false)
   }
 
   const handleDeleteTimelineItem = (fileName: string) => {
@@ -125,6 +145,17 @@ export default function Home() {
       .map(file => file.name)
     setTimelineItems(completedFiles)
   }, [uploadedFiles])
+
+  // 按类别对文件进行分组
+  const groupedFiles = Object.entries(fileCategories).reduce((acc, [category, _]) => {
+    acc[category] = uploadedFiles.filter(
+      file => fileCategories[file.name] === category && 
+      file.status === "completed" &&
+      timelineItems.includes(file.name) &&
+      !deletedTimelineItems.includes(file.name)
+    )
+    return acc
+  }, {} as { [key: string]: PdfFile[] })
 
   return (
     <main className="flex h-screen bg-white dark:bg-[#323232]">
@@ -155,11 +186,12 @@ export default function Home() {
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         onClick={handleSidebarClick}
+        onClusterButton={handleClusterClick}
       />
 
       {/* Middle Content Area */}
       <div
-        className={`flex-1 border-r border-gray-200 dark:border-[#454545] p-4 transition-all duration-300 ease-in-out ${sidebarCollapsed ? 'w-1/2' : ''}`}
+        className={`middle-area flex-1 border-r border-gray-200 dark:border-[#454545] p-4 transition-all duration-300 ease-in-out ${sidebarCollapsed ? 'w-1/2' : ''}`}
         onDragOver={(e) => e.preventDefault()}
         onDrop={(e) => {
           e.preventDefault()
@@ -167,33 +199,42 @@ export default function Home() {
           if (fileName && deletedTimelineItems.includes(fileName)) {
             const file = uploadedFiles.find((f) => f.name === fileName)
             if (file && file.status === "completed") {
-              // console.log(fileName)
               setTimelineItems((prev) => [...prev, fileName])
               setDeletedTimelineItems((prev) => prev.filter((name) => name !== fileName))
-              console.log(timelineItems)
-              console.log(deletedTimelineItems)
             }
           }
         }}
       >
         <div className="h-full flex flex-col bg-white dark:bg-[#3A3A3A] rounded-lg shadow-sm">
-          <div className="flex-1 overflow-auto">
+          <div className={`flex-1 overflow-auto ${isClusterLoading ? 'animate-pulse' : ''}`}>
             {uploadedFiles.length > 0 ? (
               <div className="p-6">
-                <DocumentTimeline
-                  files={uploadedFiles.filter(
-                    (file) =>
-                      file.status === "completed" &&
-                      timelineItems.includes(file.name) &&
-                      !deletedTimelineItems.includes(file.name)
-                  )}
-                  selectedFile={selectedFile}
-                  onSelectFile={(file) => {
-                    setSelectedFile(file)
-                    setHoveredFile(null)
-                  }}
-                  onDeleteTimelineItem={handleDeleteTimelineItem}
-                />
+                {showClusterView ? (
+                  <ClusterView
+                    files={uploadedFiles.filter(file => file.status === "completed")}
+                    fileCategories={fileCategories}
+                    selectedFile={selectedFile}
+                    onSelectFile={(file) => {
+                      setSelectedFile(file)
+                      setHoveredFile(null)
+                    }}
+                  />
+                ) : (
+                  <DocumentTimeline
+                    files={uploadedFiles.filter(
+                      (file) =>
+                        file.status === "completed" &&
+                        timelineItems.includes(file.name) &&
+                        !deletedTimelineItems.includes(file.name)
+                    )}
+                    selectedFile={selectedFile}
+                    onSelectFile={(file) => {
+                      setSelectedFile(file)
+                      setHoveredFile(null)
+                    }}
+                    onDeleteTimelineItem={handleDeleteTimelineItem}
+                  />
+                )}
               </div>
             ) : (
               <div className="h-full flex items-center justify-center">
