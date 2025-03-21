@@ -5,7 +5,7 @@ interface ClusterViewProps {
   files: PdfFile[]
   fileCategories: { [key: string]: string }
   selectedFile: PdfFile | null
-  onSelectFile: (file: PdfFile) => void
+  onSelectFile: (file: PdfFile | null) => void
 }
 
 export function ClusterView({ files, fileCategories, selectedFile, onSelectFile }: ClusterViewProps) {
@@ -40,8 +40,10 @@ export function ClusterView({ files, fileCategories, selectedFile, onSelectFile 
                 key={file.name}
                 className={`p-4 rounded-lg border ${
                   categoryColors[category] || "bg-gray-100 border-gray-300"
-                } cursor-pointer transition-colors duration-200 hover:bg-opacity-80`}
-                onClick={() => onSelectFile(file)}
+                } cursor-pointer transition-colors duration-200 hover:bg-opacity-80 ${
+                  selectedFile?.name === file.name ? "bg-opacity-50" : ""
+                }`}
+                onClick={() => onSelectFile(selectedFile?.name === file.name ? null : file)}
               >
                 <div className="flex items-center space-x-3">
                   <FileText className="h-5 w-5 text-gray-600" />

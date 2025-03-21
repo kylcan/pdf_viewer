@@ -111,7 +111,7 @@ export default function Home() {
     setIsClusterLoading(true)
     
     // 模拟后端分析过程
-    await new Promise(resolve => setTimeout(resolve, 1500))
+    await new Promise(resolve => setTimeout(resolve, 3000))
     
     // 随机分配类别
     const categories = ["1", "2", "3"]
@@ -205,42 +205,53 @@ export default function Home() {
           }
         }}
       >
+
         <div className="h-full flex flex-col bg-white dark:bg-[#3A3A3A] rounded-lg shadow-sm">
-          <div className={`flex-1 overflow-auto ${isClusterLoading ? 'animate-pulse' : ''}`}>
-            {uploadedFiles.length > 0 ? (
-              <div className="p-6">
-                {showClusterView ? (
-                  <ClusterView
-                    files={uploadedFiles.filter(file => file.status === "completed")}
-                    fileCategories={fileCategories}
-                    selectedFile={selectedFile}
-                    onSelectFile={(file) => {
-                      setSelectedFile(file)
-                      setHoveredFile(null)
-                    }}
-                  />
-                ) : (
-                  <DocumentTimeline
-                    files={uploadedFiles.filter(
-                      (file) =>
-                        file.status === "completed" &&
-                        timelineItems.includes(file.name) &&
-                        !deletedTimelineItems.includes(file.name)
-                    )}
-                    selectedFile={selectedFile}
-                    onSelectFile={(file) => {
-                      setSelectedFile(file)
-                      setHoveredFile(null)
-                    }}
-                    onDeleteTimelineItem={handleDeleteTimelineItem}
-                  />
-                )}
-              </div>
-            ) : (
-              <div className="h-full flex items-center justify-center">
-                <p className="text-gray-500 dark:text-gray-400">{translations.selectPdf}</p>
+          <div className="flex-1 overflow-auto relative">
+            {isClusterLoading && (
+            
+              <div className="absolute inset-0 flex items-center justify-center bg-white/50 dark:bg-[#3A3A3A]/50 z-10">
+                <div className="w-64 h-2 bg-gray-200 rounded-full overflow-hidden relative">
+                  <div className="absolute w-1/3 h-full bg-blue-500 rounded-full animate-slide" />
+                </div>
               </div>
             )}
+            <div className={`transition-opacity duration-300 ${isClusterLoading ? 'opacity-30' : 'opacity-100'}`}>
+              {uploadedFiles.length > 0 ? (
+                <div className="p-6">
+                  {showClusterView ? (
+                    <ClusterView
+                      files={uploadedFiles.filter(file => file.status === "completed")}
+                      fileCategories={fileCategories}
+                      selectedFile={selectedFile}
+                      onSelectFile={(file) => {
+                        setSelectedFile(file)
+                        setHoveredFile(null)
+                      }}
+                    />
+                  ) : (
+                    <DocumentTimeline
+                      files={uploadedFiles.filter(
+                        (file) =>
+                          file.status === "completed" &&
+                          timelineItems.includes(file.name) &&
+                          !deletedTimelineItems.includes(file.name)
+                      )}
+                      selectedFile={selectedFile}
+                      onSelectFile={(file) => {
+                        setSelectedFile(file)
+                        setHoveredFile(null)
+                      }}
+                      onDeleteTimelineItem={handleDeleteTimelineItem}
+                    />
+                  )}
+                </div>
+              ) : (
+                <div className="h-full flex items-center justify-center">
+                  <p className="text-gray-500 dark:text-gray-400">{translations.selectPdf}</p>
+                </div>
+              )}
+            </div>
           </div>
           <ContentFooter 
             showClusterButton={showClusterButton}

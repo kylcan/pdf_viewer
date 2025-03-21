@@ -11,6 +11,15 @@ module.exports = {
   ],
   theme: {
     extend: {
+      keyframes: {
+        slide: {
+          "0%": { transform: "translateX(-100%)" },  // 从左侧完全隐藏
+          "100%": { transform: "translateX(200%)" }  // 直接滑到最右侧
+        }
+      },
+      animation: {
+        slide: "slide 1.5s linear infinite"
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -55,4 +64,3 @@ module.exports = {
   },
   plugins: [require("tailwindcss-animate")],
 }
-
