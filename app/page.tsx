@@ -32,6 +32,7 @@ export default function Home() {
   const [fileCategories, setFileCategories] = useState<{ [key: string]: string }>({})
   const [showClusterView, setShowClusterView] = useState(false)
   const [isClusterLoading, setIsClusterLoading] = useState(false)
+  const [deletedFromCategories, setDeletedFromCategories] = useState<string[]>([])
 
   const { uploadedFiles, processFiles, handleDeleteFile, handleReupload } = useFileUpload()
 
@@ -130,6 +131,9 @@ export default function Home() {
   const handleDeleteTimelineItem = (fileName: string) => {
     setTimelineItems((prev) => prev.filter((name) => name !== fileName))
     setDeletedTimelineItems((prev) => [...prev, fileName])
+    if (showClusterView) {
+      setDeletedFromCategories((prev) => [...prev, fileName])
+    }
   }
 
   const filteredFiles = uploadedFiles.filter((file) => file.name.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -196,11 +200,17 @@ export default function Home() {
         onDrop={(e) => {
           e.preventDefault()
           const fileName = e.dataTransfer.getData("text/plain")
-          if (fileName && deletedTimelineItems.includes(fileName)) {
+          if (fileName && !timelineItems.includes(fileName)) {
             const file = uploadedFiles.find((f) => f.name === fileName)
             if (file && file.status === "completed") {
               setTimelineItems((prev) => [...prev, fileName])
-              setDeletedTimelineItems((prev) => prev.filter((name) => name !== fileName))
+              if (deletedFromCategories.includes(fileName) || !fileCategories[fileName]) {
+                setFileCategories((prev) => ({
+                  ...prev,
+                  [fileName]: "未分类"
+                }))
+              }
+              setDeletedTimelineItems((prev) => prev.filter(name => name !== fileName))
             }
           }
         }}
