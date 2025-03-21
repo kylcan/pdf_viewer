@@ -1,14 +1,15 @@
 import { PdfFile } from "@/types"
-import { FileText } from "lucide-react"
+import { FileText, X } from "lucide-react"
 
 interface ClusterViewProps {
   files: PdfFile[]
   fileCategories: { [key: string]: string }
   selectedFile: PdfFile | null
   onSelectFile: (file: PdfFile | null) => void
+  onDeleteTimelineItem: (fileName: string) => void
 }
 
-export function ClusterView({ files, fileCategories, selectedFile, onSelectFile }: ClusterViewProps) {
+export function ClusterView({ files, fileCategories, selectedFile, onSelectFile, onDeleteTimelineItem }: ClusterViewProps) {
   // 按类别对文件进行分组，并在每个类别内按时间排序
   const groupedFiles = files.reduce((acc, file) => {
     const category = fileCategories[file.name] || "未分类"
@@ -36,8 +37,8 @@ export function ClusterView({ files, fileCategories, selectedFile, onSelectFile 
   return (
     <div className="space-y-6">
       {Object.entries(groupedFiles).map(([category, categoryFiles]) => (
-        <div key={category} className="space-y-3">
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
+        <div key={category} className="space-y-2">
+          <h3 className="text-lg font-semibold text-gray-800 dark:text-white px-4">
             Category {category}
           </h3>
           <div className={`rounded-lg border ${categoryColors[category] || "bg-gray-50 border-gray-200"}`}>
@@ -47,11 +48,13 @@ export function ClusterView({ files, fileCategories, selectedFile, onSelectFile 
                 className={`p-4 cursor-pointer transition-colors duration-200 hover:bg-black/5 ${
                   selectedFile?.name === file.name ? "bg-black/10" : ""
                 } ${index !== 0 ? "border-t border-inherit" : ""}`}
-                onClick={() => onSelectFile(selectedFile?.name === file.name ? null : file)}
               >
                 <div className="flex items-center space-x-3">
                   <FileText className="h-5 w-5 text-gray-600" />
-                  <div className="flex-1">
+                  <div 
+                    className="flex-1"
+                    onClick={() => onSelectFile(selectedFile?.name === file.name ? null : file)}
+                  >
                     <h4 className="font-medium text-gray-900 dark:text-white">
                       {file.name}
                     </h4>
@@ -59,6 +62,15 @@ export function ClusterView({ files, fileCategories, selectedFile, onSelectFile 
                       {file.releaseDate?.toLocaleDateString()}
                     </p>
                   </div>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onDeleteTimelineItem(file.name)
+                    }}
+                    className="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                  >
+                    <X className="h-4 w-4 text-gray-500" />
+                  </button>
                 </div>
               </div>
             ))}

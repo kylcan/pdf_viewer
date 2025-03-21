@@ -128,8 +128,8 @@ export default function Home() {
   }
 
   const handleDeleteTimelineItem = (fileName: string) => {
-    setDeletedTimelineItems((prev) => [...prev, fileName])
     setTimelineItems((prev) => prev.filter((name) => name !== fileName))
+    setDeletedTimelineItems((prev) => [...prev, fileName])
   }
 
   const filteredFiles = uploadedFiles.filter((file) => file.name.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -216,18 +216,24 @@ export default function Home() {
                 </div>
               </div>
             )}
-            <div className={`transition-opacity duration-300 ${isClusterLoading ? 'opacity-30' : 'opacity-100'}`}>
+            <div className={`h-full transition-opacity duration-300 ${isClusterLoading ? 'opacity-30' : 'opacity-100'}`}>
               {uploadedFiles.length > 0 ? (
                 <div className="p-6">
                   {showClusterView ? (
                     <ClusterView
-                      files={uploadedFiles.filter(file => file.status === "completed")}
+                      files={uploadedFiles.filter(
+                        (file) =>
+                          file.status === "completed" &&
+                          timelineItems.includes(file.name) &&
+                          !deletedTimelineItems.includes(file.name)
+                      )}
                       fileCategories={fileCategories}
                       selectedFile={selectedFile}
                       onSelectFile={(file) => {
                         setSelectedFile(file)
                         setHoveredFile(null)
                       }}
+                      onDeleteTimelineItem={handleDeleteTimelineItem}
                     />
                   ) : (
                     <DocumentTimeline
@@ -248,7 +254,9 @@ export default function Home() {
                 </div>
               ) : (
                 <div className="h-full flex items-center justify-center">
-                  <p className="text-gray-500 dark:text-gray-400">{translations.selectPdf}</p>
+                  <p className="text-gray-500 dark:text-gray-400">
+                    {translations.selectPdf}
+                  </p>
                 </div>
               )}
             </div>
