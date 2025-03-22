@@ -13,6 +13,7 @@ import { Sidebar } from "@/components/sidebar/Sidebar"
 import { useFileUpload } from "@/hooks/useFileUpload"
 import { ContentFooter } from "@/components/content/ContentFooter"
 import { ClusterView } from "@/components/cluster-view/ClusterView"
+import { GeneratedContent } from "@/components/content/GeneratedContent"
 
 export default function Home() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
@@ -33,6 +34,8 @@ export default function Home() {
   const [showClusterView, setShowClusterView] = useState(false)
   const [isClusterLoading, setIsClusterLoading] = useState(false)
   const [deletedFromCategories, setDeletedFromCategories] = useState<string[]>([])
+  const [generatedContent, setGeneratedContent] = useState<string>("")
+  const [isGenerating, setIsGenerating] = useState(false)
 
   const { uploadedFiles, processFiles, handleDeleteFile, handleReupload } = useFileUpload()
 
@@ -168,6 +171,61 @@ export default function Home() {
     return acc
   }, {} as { [key: string]: PdfFile[] })
 
+  // 两个不同的生成函数
+  const generateWithoutClusters = async () => {
+    await new Promise(resolve => setTimeout(resolve, 2000))
+    return `Generated Summary (Without Clustering):
+
+${timelineItems.map((item, index) => `
+${index + 1}. Document: ${item}
+   - Basic analysis completed
+   - Key points extracted
+   - Main findings summarized`).join('\n')}
+
+This is a mock generated content for documents without clustering.
+You can edit this content by clicking the edit button above.`
+  }
+
+  const generateWithClusters = async () => {
+    await new Promise(resolve => setTimeout(resolve, 2000))
+    return `Generated Summary (With Clustering):
+
+${Object.entries(fileCategories).reduce((acc, [fileName, category]) => {
+  if (timelineItems.includes(fileName)) {
+    acc[category] = acc[category] || []
+    acc[category].push(fileName)
+  }
+  return acc
+}, {} as Record<string, string[]>)}
+
+Cluster Analysis Results:
+${Object.entries(fileCategories)
+  .map(([category, files]) => 
+    `Category ${category}:
+    - Documents: ${files.length}
+    - Common themes identified
+    - Cross-references noted`
+  ).join('\n')}
+
+This is a mock generated content for clustered documents.
+You can edit this content by clicking the edit button above.`
+  }
+
+  // 修改处理生成的函数
+  const handleGenerate = async () => {
+    setIsGenerating(true)
+    try {
+      const content = showClusterView 
+        ? await generateWithClusters()
+        : await generateWithoutClusters()
+      setGeneratedContent(content)
+    } catch (error) {
+      console.error('Generation failed:', error)
+    } finally {
+      setIsGenerating(false)
+    }
+  }
+
   return (
     <main className="flex h-screen bg-white dark:bg-[#323232]">
       <Sidebar
@@ -201,28 +259,7 @@ export default function Home() {
       />
 
       {/* Middle Content Area */}
-      <div
-        className={`middle-area flex-1 border-r border-gray-200 dark:border-[#454545] p-4 transition-all duration-300 ease-in-out ${sidebarCollapsed ? 'w-1/2' : ''}`}
-        onDragOver={(e) => e.preventDefault()}
-        onDrop={(e) => {
-          e.preventDefault()
-          const fileName = e.dataTransfer.getData("text/plain")
-          if (fileName && !timelineItems.includes(fileName)) {
-            const file = uploadedFiles.find((f) => f.name === fileName)
-            if (file && file.status === "completed") {
-              setTimelineItems((prev) => [...prev, fileName])
-              if (deletedFromCategories.includes(fileName) || !fileCategories[fileName]) {
-                setFileCategories((prev) => ({
-                  ...prev,
-                  [fileName]: "未分类"
-                }))
-              }
-              setDeletedTimelineItems((prev) => prev.filter(name => name !== fileName))
-            }
-          }
-        }}
-      >
-
+      <div className="flex-1 max-w-[50%] border-r border-gray-200 dark:border-[#454545] p-4">
         <div className="h-full flex flex-col bg-white dark:bg-[#3A3A3A] rounded-lg shadow-sm">
           <div className="flex-1 overflow-auto relative">
             {isClusterLoading && (
@@ -282,15 +319,20 @@ export default function Home() {
           <ContentFooter 
             showClusterButton={showClusterButton}
             onClusterButton={handleClusterClick}
+            onGenerate={handleGenerate}
+            isGenerating={isGenerating}
           />
         </div>
       </div>
 
-      {/* Right Content Area */}
-      <div className={`hidden md:block p-4 transition-all duration-300 ease-in-out ${sidebarCollapsed ? 'w-1/2' : 'w-1/3'}`}>
-        <div className="h-full flex items-center justify-center bg-white dark:bg-[#3A3A3A] rounded-lg shadow-sm">
-          <p className="text-gray-500 dark:text-gray-400">{translations.additionalInfo}</p>
-        </div>
+      {/* Left Content Area */}
+      <div className="flex-1 relative">
+        {generatedContent && (
+          <GeneratedContent
+            content={generatedContent}
+            onContentChange={setGeneratedContent}
+          />
+        )}
       </div>
 
       <SettingsDialog open={settingsOpen} onOpenChange={setSettingsOpen} />

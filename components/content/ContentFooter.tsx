@@ -4,9 +4,16 @@ import { useSettings } from "@/contexts/settings-context"
 interface ContentFooterProps {
   showClusterButton: boolean
   onClusterButton: () => void
+  onGenerate: () => void
+  isGenerating: boolean
 }
 
-export function ContentFooter({ showClusterButton, onClusterButton }: ContentFooterProps) {
+export function ContentFooter({ 
+  showClusterButton, 
+  onClusterButton, 
+  onGenerate,
+  isGenerating 
+}: ContentFooterProps) {
   const { translations } = useSettings()
 
   return (
@@ -19,10 +26,11 @@ export function ContentFooter({ showClusterButton, onClusterButton }: ContentFoo
           {showClusterButton && (
             <>
               <Button
-                onClick={() => console.log("Start Generating")}
+                onClick={onGenerate}
+                disabled={isGenerating}
                 className="w-full bg-[#71a3e4] hover:bg-blue-600 text-white dark:bg-gray-600 dark:hover:bg-gray-700"
               >
-                Start Generating
+                {isGenerating ? 'Generating...' : 'Start Generating'}
               </Button>
               <Button
                 onClick={onClusterButton}
