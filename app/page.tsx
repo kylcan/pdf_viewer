@@ -136,6 +136,13 @@ export default function Home() {
     }
   }
 
+  const handleUpdateCategory = (fileName: string, newCategory: string) => {
+    setFileCategories((prev) => ({
+      ...prev,
+      [fileName]: newCategory
+    }))
+  }
+
   const filteredFiles = uploadedFiles.filter((file) => file.name.toLowerCase().includes(searchQuery.toLowerCase()))
 
   useEffect(() => {
@@ -244,6 +251,7 @@ export default function Home() {
                         setHoveredFile(null)
                       }}
                       onDeleteTimelineItem={handleDeleteTimelineItem}
+                      onUpdateCategory={handleUpdateCategory}
                     />
                   ) : (
                     <DocumentTimeline

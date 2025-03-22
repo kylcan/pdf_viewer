@@ -7,9 +7,17 @@ interface ClusterViewProps {
   selectedFile: PdfFile | null
   onSelectFile: (file: PdfFile | null) => void
   onDeleteTimelineItem: (fileName: string) => void
+  onUpdateCategory: (fileName: string, newCategory: string) => void
 }
 
-export function ClusterView({ files, fileCategories, selectedFile, onSelectFile, onDeleteTimelineItem }: ClusterViewProps) {
+export function ClusterView({ 
+  files, 
+  fileCategories, 
+  selectedFile, 
+  onSelectFile, 
+  onDeleteTimelineItem,
+  onUpdateCategory 
+}: ClusterViewProps) {
   // 按类别对文件进行分组，并在每个类别内按时间排序
   const groupedFiles = files.reduce((acc, file) => {
     const category = fileCategories[file.name] || "未分类"
@@ -37,7 +45,25 @@ export function ClusterView({ files, fileCategories, selectedFile, onSelectFile,
   return (
     <div className="space-y-6">
       {Object.entries(groupedFiles).map(([category, categoryFiles]) => (
-        <div key={category} className="space-y-2">
+        <div 
+          key={category} 
+          className="space-y-2"
+          onDragOver={(e) => {
+            e.preventDefault()
+            e.currentTarget.classList.add('bg-black/5')
+          }}
+          onDragLeave={(e) => {
+            e.currentTarget.classList.remove('bg-black/5')
+          }}
+          onDrop={(e) => {
+            e.preventDefault()
+            e.currentTarget.classList.remove('bg-black/5')
+            const fileName = e.dataTransfer.getData("text/plain")
+            if (fileName && fileCategories[fileName] !== category) {
+              onUpdateCategory(fileName, category)
+            }
+          }}
+        >
           <h3 className="text-lg font-semibold text-gray-800 dark:text-white px-4">
             Category {category}
           </h3>
@@ -45,6 +71,10 @@ export function ClusterView({ files, fileCategories, selectedFile, onSelectFile,
             {categoryFiles.map((file, index) => (
               <div
                 key={file.name}
+                draggable
+                onDragStart={(e) => {
+                  e.dataTransfer.setData("text/plain", file.name)
+                }}
                 className={`p-4 cursor-pointer transition-colors duration-200 hover:bg-black/5 ${
                   selectedFile?.name === file.name ? "bg-black/10" : ""
                 } ${index !== 0 ? "border-t border-inherit" : ""}`}
