@@ -25,7 +25,7 @@ export function GeneratedContent({ content, onContentChange }: GeneratedContentP
   }
 
   return (
-    <div className="absolute bottom-4 left-6 right-6 h-[86%] rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#3A3A3A]">
+    <div className="absolute bottom-16 left-6 right-6 h-[80.5%] rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#3A3A3A] animate-fade-in">
       <div className="absolute top-2 right-2 flex space-x-2">
         <button
           onClick={handleEdit}

@@ -64,7 +64,7 @@ export function ClusterView({
             }
           }}
         >
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-white px-4">
+          <h3 className="text-lg font-semibold text-gray-800 dark:text-white ">
             Category {category}
           </h3>
           <div className={`rounded-lg border ${categoryColors[category] || "bg-gray-50 border-gray-200"}`}>
@@ -85,10 +85,10 @@ export function ClusterView({
                     className="flex-1"
                     onClick={() => onSelectFile(selectedFile?.name === file.name ? null : file)}
                   >
-                    <h4 className="font-medium text-gray-900 dark:text-white">
+                    <h4 className="text-sm text-gray-900 dark:text-white">
                       {file.name}
                     </h4>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
                       {file.releaseDate?.toLocaleDateString()}
                     </p>
                   </div>

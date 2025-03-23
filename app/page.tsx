@@ -228,40 +228,44 @@ You can edit this content by clicking the edit button above.`
 
   return (
     <main className="flex h-screen bg-white dark:bg-[#323232]">
-      <Sidebar
-        collapsed={sidebarCollapsed}
-        onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        files={filteredFiles.map((file) => ({
-          ...file,
-          draggable: true,
-          onDragStart: (e: React.DragEvent<HTMLLIElement>) => {
-            e.dataTransfer.setData("text/plain", file.name)
-          },
-        }))}
-        selectedFile={selectedFile}
-        hoveredFile={hoveredFile}
-        hoverPosition={hoverPosition}
-        onFileClick={handleFileClick}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-        onDeleteFile={handleDeleteFile}
-        onReupload={handleReupload}
-        onManualInput={handleManualInput}
-        onSettingsClick={() => setSettingsOpen(true)}
-        isDragging={isDragging}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
-        onClick={handleSidebarClick}
-        onClusterButton={handleClusterClick}
-      />
-
-      {/* Middle Content Area */}
-      <div className="flex-1 max-w-[50%] border-r border-gray-200 dark:border-[#454545] p-4">
-        <div className="h-full flex flex-col bg-white dark:bg-[#3A3A3A] rounded-lg shadow-sm">
-          <div className="flex-1 overflow-auto relative">
+          <Sidebar
+            collapsed={sidebarCollapsed}
+            onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            files={filteredFiles.map((file) => ({
+              ...file,
+              draggable: true,
+              onDragStart: (e: React.DragEvent<HTMLLIElement>) => {
+                e.dataTransfer.setData("text/plain", file.name)
+              },
+            }))}
+            selectedFile={selectedFile}
+            hoveredFile={hoveredFile}
+            hoverPosition={hoverPosition}
+            onFileClick={handleFileClick}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+            onDeleteFile={handleDeleteFile}
+            onReupload={handleReupload}
+            onManualInput={handleManualInput}
+            onSettingsClick={() => setSettingsOpen(true)}
+            isDragging={isDragging}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            onClick={handleSidebarClick}
+            onClusterButton={handleClusterClick}
+          />
+      {/* Middle area */}
+      <div className="flex-1 max-w-[50%] border-r border-gray-200 dark:border-[#454545]">
+        <div className="h-full flex flex-col bg-white dark:bg-[#3A3A3A] rounded-lg">
+          <div className="p-4 h-[60px] flex items-center pl-8">
+            <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
+              {showClusterView ? "Clustering Results" : "Timeline View"}
+            </h2>
+          </div>
+          <div className="flex-1 overflow-auto relative px-4 -mt-3.5">
             {isClusterLoading && (
             
               <div className="absolute inset-0 flex items-center justify-center bg-white/50 dark:bg-[#3A3A3A]/50 z-10">
@@ -325,13 +329,20 @@ You can edit this content by clicking the edit button above.`
         </div>
       </div>
 
-      {/* Left Content Area */}
-      <div className="flex-1 relative">
+      {/* Left area */}
+      <div className="flex-1 relative h-full">
         {generatedContent && (
-          <GeneratedContent
-            content={generatedContent}
-            onContentChange={setGeneratedContent}
-          />
+          <div className="h-full animate-fade-in">
+            <div className="p-4 h-[60px] flex items-center pl-5">
+              <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
+                Generated Content
+              </h2>
+            </div>
+            <GeneratedContent
+              content={generatedContent}
+              onContentChange={setGeneratedContent}
+            />
+          </div>
         )}
       </div>
 

@@ -15,10 +15,15 @@ module.exports = {
         slide: {
           "0%": { transform: "translateX(-100%)" },  // 从左侧完全隐藏
           "100%": { transform: "translateX(200%)" }  // 直接滑到最右侧
+        },
+        'fade-in': {
+          '0%': { opacity: '0', transform: 'translateY(10px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' }
         }
       },
       animation: {
-        slide: "slide 1.5s linear infinite"
+        slide: "slide 1.5s linear infinite",
+        'fade-in': 'fade-in 0.5s ease-out forwards'
       },
       colors: {
         border: "hsl(var(--border))",

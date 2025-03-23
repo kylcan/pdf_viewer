@@ -43,7 +43,7 @@ export function DocumentTimeline({ files, selectedFile, onSelectFile, onDeleteTi
 
   return (
     <div className="relative pl-6 after:absolute after:inset-y-0 after:left-0 after:w-px after:bg-blue-200 dark:after:bg-gray-600">
-      <h2 className="text-lg font-semibold mb-2 text-gray-800 dark:text-white">Document Timeline</h2>
+      {/* <h2 className="text-lg font-semibold mb-2 text-gray-800 dark:text-white">Document Timeline</h2> */}
       {timelineItems
         .filter((item) => item.status === "completed")
         .map((item) => (
