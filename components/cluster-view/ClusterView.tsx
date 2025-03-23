@@ -27,11 +27,11 @@ export function ClusterView({
       acc[category] = []
     }
     acc[category].push(file)
-    // 确保每个类别的文件按时间排序
+    // 修改为升序排列（旧的在前）
     acc[category].sort((a, b) => {
       const dateA = a.releaseDate?.getTime() || 0
       const dateB = b.releaseDate?.getTime() || 0
-      return dateB - dateA // 降序排列（新的在前）
+      return dateA - dateB // 改为升序
     })
     return acc
   }, {} as { [key: string]: PdfFile[] })

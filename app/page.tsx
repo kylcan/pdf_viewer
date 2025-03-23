@@ -258,10 +258,42 @@ You can edit this content by clicking the edit button above.`
             onClusterButton={handleClusterClick}
           />
       {/* Middle area */}
-      <div className="flex-1 max-w-[50%] border-r border-gray-200 dark:border-[#454545]">
+      <div className="flex-1 max-w-[50%] border-r border-gray-200 dark:border-[#454545]"
+        onDragOver={(e) => e.preventDefault()}
+        onDrop={(e) => {
+          e.preventDefault()
+          const fileName = e.dataTransfer.getData("text/plain")
+          
+          // 如果文件在已删除列表中，说明是要恢复到 timeline
+          if (fileName && deletedTimelineItems.includes(fileName)) {
+            const file = uploadedFiles.find((f) => f.name === fileName)
+            if (file && file.status === "completed") {
+              setTimelineItems((prev) => [...prev, fileName])
+              setDeletedTimelineItems((prev) => prev.filter((name) => name !== fileName))
+            }
+          }
+          
+          // 如果文件不在分类中，且拖到分类视图，则添加到"未分类"
+          if (fileName && (deletedTimelineItems.includes(fileName) || deletedFromCategories.includes(fileName) || !fileCategories[fileName])) {
+            const file = uploadedFiles.find((f) => f.name === fileName)
+            if (file && file.status === "completed"){
+              setFileCategories((prev) => ({
+                ...prev,
+                [fileName]: "Unknow"
+              }))
+              setDeletedFromCategories((prev) => 
+                prev.filter((name) => name !== fileName)
+              )
+              setTimelineItems((prev) => [...prev, fileName])
+              setDeletedTimelineItems((prev) => prev.filter((name) => name !== fileName))
+            }
+            
+          }
+        }}
+      >
         <div className="h-full flex flex-col bg-white dark:bg-[#3A3A3A] rounded-lg">
           <div className="p-4 h-[60px] flex items-center pl-8">
-            {(uploadedFiles.length > 0 || showClusterView) && (
+            {(timelineItems.length > 0 || showClusterView) && (
               <h2 className="text-xl font-semibold text-gray-800 dark:text-white animate-fade-in">
                 {translations[showClusterView ? "clusteringResults" : "timelineView"]}
               </h2>

@@ -30,7 +30,8 @@ export function ContentFooter({
                 disabled={isGenerating}
                 className="w-full bg-[#71a3e4] hover:bg-blue-600 text-white dark:bg-gray-600 dark:hover:bg-gray-700"
               >
-                {isGenerating ? 'Generating...' : 'Start Generating'}
+                {isGenerating ? 'Generating...' : translations.startGenerating || "开始生成"}
+                {/* {translations.startGenerating || "开始生成"} */}
               </Button>
               <Button
                 onClick={onClusterButton}
