@@ -50,9 +50,9 @@ export function DocumentTimeline({ files, selectedFile, onSelectFile, onDeleteTi
           <ContextMenu key={item.name}>
             <ContextMenuTrigger>
               <div
-                className={`mb-1 last:mb-0 relative ${
+                className={`mb-1 last:mb-0 relative relative${
                   selectedFile?.name === item.name ? "opacity-100" : "opacity-80 hover:opacity-100"
-                }`}
+                } animate-fade-in`}
               >
                 <div
                   className={`absolute left-0 top-[16px] w-3 h-3 rounded-full z-10 transform -translate-x-[7px] ${

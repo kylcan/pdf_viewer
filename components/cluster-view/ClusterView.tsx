@@ -8,6 +8,7 @@ interface ClusterViewProps {
   onSelectFile: (file: PdfFile | null) => void
   onDeleteTimelineItem: (fileName: string) => void
   onUpdateCategory: (fileName: string, newCategory: string) => void
+  translations: any
 }
 
 export function ClusterView({ 
@@ -16,7 +17,8 @@ export function ClusterView({
   selectedFile, 
   onSelectFile, 
   onDeleteTimelineItem,
-  onUpdateCategory 
+  onUpdateCategory,
+  translations
 }: ClusterViewProps) {
   // 按类别对文件进行分组，并在每个类别内按时间排序
   const groupedFiles = files.reduce((acc, file) => {
@@ -36,10 +38,12 @@ export function ClusterView({
 
   // 为每个类别定义不同的颜色
   const categoryColors: { [key: string]: string } = {
-    "1": "bg-blue-100 border-blue-200",
-    "2": "bg-green-100 border-green-200",
-    "3": "bg-yellow-100 border-yellow-200",
-    "未分类": "bg-gray-100 border-gray-200"
+    "1": "bg-blue-50 border-blue-200 dark:bg-blue-900/30 dark:border-blue-800",
+    "2": "bg-green-50 border-green-200 dark:bg-green-900/30 dark:border-green-800",
+    "3": "bg-purple-50 border-purple-200 dark:bg-purple-900/30 dark:border-purple-800",
+    "4": "bg-orange-50 border-orange-200 dark:bg-orange-900/30 dark:border-orange-800",
+    "5": "bg-pink-50 border-pink-200 dark:bg-pink-900/30 dark:border-pink-800",
+    "未分类": "bg-gray-50 border-gray-200 dark:bg-gray-800/50 dark:border-gray-700"
   }
 
   return (
@@ -64,8 +68,8 @@ export function ClusterView({
             }
           }}
         >
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-white ">
-            Category {category}
+          <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
+            {translations.category} {category}
           </h3>
           <div className={`rounded-lg border ${categoryColors[category] || "bg-gray-50 border-gray-200"}`}>
             {categoryFiles.map((file, index) => (

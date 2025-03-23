@@ -261,9 +261,11 @@ You can edit this content by clicking the edit button above.`
       <div className="flex-1 max-w-[50%] border-r border-gray-200 dark:border-[#454545]">
         <div className="h-full flex flex-col bg-white dark:bg-[#3A3A3A] rounded-lg">
           <div className="p-4 h-[60px] flex items-center pl-8">
-            <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
-              {showClusterView ? "Clustering Results" : "Timeline View"}
-            </h2>
+            {(uploadedFiles.length > 0 || showClusterView) && (
+              <h2 className="text-xl font-semibold text-gray-800 dark:text-white animate-fade-in">
+                {translations[showClusterView ? "clusteringResults" : "timelineView"]}
+              </h2>
+            )}
           </div>
           <div className="flex-1 overflow-auto relative px-4 -mt-3.5">
             {isClusterLoading && (
@@ -293,6 +295,7 @@ You can edit this content by clicking the edit button above.`
                       }}
                       onDeleteTimelineItem={handleDeleteTimelineItem}
                       onUpdateCategory={handleUpdateCategory}
+                      translations={translations}
                     />
                   ) : (
                     <DocumentTimeline
@@ -333,9 +336,9 @@ You can edit this content by clicking the edit button above.`
       <div className="flex-1 relative h-full">
         {generatedContent && (
           <div className="h-full animate-fade-in">
-            <div className="p-4 h-[60px] flex items-center pl-5">
+            <div className="p-4 h-[60px] flex items-center pl-8">
               <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
-                Generated Content
+                {translations.generatedContent}
               </h2>
             </div>
             <GeneratedContent

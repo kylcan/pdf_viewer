@@ -45,6 +45,11 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       manualInputTitle: "Manual Entry",
       manualInputPlaceholder: "Enter content here...",
       cluster: "Cluster Analysis",
+      clusteringResults: "Clustering Results",
+      timelineView: "Timeline View",
+      generatedContent: "Generated Content",
+      startGenerating: "Start Generating",
+      category: "Category",
     },
     zh: {
       settings: "设置",
@@ -69,6 +74,11 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       manualEntryTitle: "手动输入",
       manualInputPlaceholder: "此处输入内容",
       cluster: "聚类分析",
+      timelineView: "时间轴展示",
+      clusteringResults: "分类结果",
+      generatedContent: "生成内容",
+      startGenerating: "开始生成",
+      category: "类别",
     },
   }
 
