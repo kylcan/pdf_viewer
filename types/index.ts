@@ -28,4 +28,3 @@ export interface BackendInterface {
   uploadPdf: (file: File, onProgress: (progress: number) => void) => Promise<{ success: boolean; message: string }>
   analyzePdf: (fileName: string) => Promise<AnalysisResponse>
 }
-

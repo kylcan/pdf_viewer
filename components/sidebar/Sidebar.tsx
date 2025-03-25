@@ -57,7 +57,7 @@ export function Sidebar({
   return (
     <div
       className={`relative bg-gray-100 dark:bg-[#3A3A3A] transition-all duration-300 ${
-        collapsed ? "w-12" : "w-64 md:w-80"
+        collapsed ? 'w-[60px]' : 'w-[280px]'
       } ${isDragging && !collapsed ? "bg-opacity-70" : ""}`}
       onDragOver={onDragOver}
       onDragLeave={onDragLeave}

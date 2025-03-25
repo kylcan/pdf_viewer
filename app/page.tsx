@@ -258,7 +258,7 @@ You can edit this content by clicking the edit button above.`
             onClusterButton={handleClusterClick}
           />
       {/* Middle area */}
-      <div className="flex-1 max-w-[50%] border-r border-gray-200 dark:border-[#454545]"
+      <div className="flex-1 max-w-[50%] border-r border-gray-200 dark:border-[#454545] relative"
         onDragOver={(e) => e.preventDefault()}
         onDrop={(e) => {
           e.preventDefault()
@@ -291,24 +291,32 @@ You can edit this content by clicking the edit button above.`
           }
         }}
       >
+        {isClusterLoading && (
+          <div className="absolute inset-0 flex items-center justify-center bg-white/50 dark:bg-[#3A3A3A]/50 z-10">
+            <div className="w-64 h-2 bg-gray-200 rounded-full overflow-hidden relative">
+              <div className="absolute w-1/3 h-full bg-blue-500 rounded-full animate-slide" />
+            </div>
+          </div>
+        )}
         <div className="h-full flex flex-col bg-white dark:bg-[#3A3A3A] rounded-lg">
+          
           <div className="p-4 h-[60px] flex items-center pl-8">
-            {(timelineItems.length > 0 || showClusterView) && (
-              <h2 className="text-xl font-semibold text-gray-800 dark:text-white animate-fade-in">
-                {translations[showClusterView ? "clusteringResults" : "timelineView"]}
-              </h2>
+            {(uploadedFiles.length > 0 || showClusterView) && (
+              <div
+                className={`transition-opacity duration-300 ${
+                  isClusterLoading ? 'opacity-50' : 'opacity-100'
+                }`}
+              >
+                <h2 className="text-xl font-semibold text-gray-800 dark:text-white animate-fade-in">
+                  {translations[showClusterView ? "clusteringResults" : "timelineView"]}
+                </h2>
+              </div>
             )}
           </div>
           <div className="flex-1 overflow-auto relative px-4 -mt-3.5">
-            {isClusterLoading && (
-            
-              <div className="absolute inset-0 flex items-center justify-center bg-white/50 dark:bg-[#3A3A3A]/50 z-10">
-                <div className="w-64 h-2 bg-gray-200 rounded-full overflow-hidden relative">
-                  <div className="absolute w-1/3 h-full bg-blue-500 rounded-full animate-slide" />
-                </div>
-              </div>
-            )}
-            <div className={`h-full transition-opacity duration-300 ${isClusterLoading ? 'opacity-30' : 'opacity-100'}`}>
+            <div className={`h-full transition-opacity duration-300 ${
+              isClusterLoading ? 'opacity-50' : 'opacity-100'
+            }`}>
               {uploadedFiles.length > 0 ? (
                 <div className="p-6">
                   {showClusterView ? (
