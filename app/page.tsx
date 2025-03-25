@@ -14,6 +14,7 @@ import { useFileUpload } from "@/hooks/useFileUpload"
 import { ContentFooter } from "@/components/content/ContentFooter"
 import { ClusterView } from "@/components/cluster-view/ClusterView"
 import { GeneratedContent } from "@/components/content/GeneratedContent"
+import mockBackend from "@/lib/mockBackend"
 
 export default function Home() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
@@ -36,8 +37,9 @@ export default function Home() {
   const [deletedFromCategories, setDeletedFromCategories] = useState<string[]>([])
   const [generatedContent, setGeneratedContent] = useState<string>("")
   const [isGenerating, setIsGenerating] = useState(false)
+  const [fileToReanalyze, setFileToReanalyze] = useState<string | null>(null)
 
-  const { uploadedFiles, processFiles, handleDeleteFile, handleReupload } = useFileUpload()
+  const { uploadedFiles, processFiles, handleDeleteFile, handleReupload, setUploadedFiles } = useFileUpload()
 
   const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault()
@@ -103,12 +105,59 @@ export default function Home() {
   }
 
   const handleManualInput = (fileName: string) => {
+    setFileToReanalyze(fileName)
     setManualInputOpen(true)
   }
 
-  const handleSendToBackend = () => {
-    console.log("Sending to backend:", inputContent)
+  const handleInputSendToBackend = async () => {
+    if (!inputContent.trim() || !fileToReanalyze) return
+    
+    console.log('Starting reanalysis for:', fileToReanalyze)
+    
+    setUploadedFiles(prev => {
+      const newFiles = prev.map(f =>
+        f.name === fileToReanalyze
+          ? { ...f, status: 'processing' as const, progress: 0 }
+          : f
+      )
+      console.log('Updated files:', newFiles)
+      return newFiles
+    })
+    
     setManualInputOpen(false)
+    setInputContent('')
+    
+    try {
+      const analysis = await mockBackend.analyzePdf(inputContent)
+      
+      setUploadedFiles(prev =>
+        prev.map(f =>
+          f.name === fileToReanalyze
+            ? {
+                ...f,
+                status: 'completed',
+                progress: 100,
+                summary: analysis.summary,
+                author: analysis.author,
+                releaseDate: analysis.releaseDate,
+              }
+            : f
+        )
+      )
+    } catch (error) {
+      setUploadedFiles(prev =>
+        prev.map(f =>
+          f.name === fileToReanalyze
+            ? {
+                ...f,
+                status: 'error',
+                progress: 0,
+                error: error instanceof Error ? error.message : 'Unknown error',
+              }
+            : f
+        )
+      )
+    }
   }
 
   const handleClusterClick = async () => {
@@ -408,7 +457,7 @@ You can edit this content by clicking the edit button above.`
               {translations.cancel}
             </Button>
             <Button
-              onClick={handleSendToBackend}
+              onClick={handleInputSendToBackend}
               className="bg-[#71a3e4] text-white dark:bg-gray-500 dark:text-white"
             >
               {translations.submit}
