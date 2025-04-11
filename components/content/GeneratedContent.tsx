@@ -17,6 +17,7 @@ export function GeneratedContent({ content, onContentChange }: GeneratedContentP
   const [newGeneratedContent, setNewGeneratedContent] = useState<string | null>(null)
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null)
   const [menuPosition, setMenuPosition] = useState<{ x: number; y: number } | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(content)
@@ -59,12 +60,13 @@ export function GeneratedContent({ content, onContentChange }: GeneratedContentP
 
   const handleRegenerate = async () => {
     if (!selectedText) return
-    setContextMenuVisible(false)
-
-    // 模拟后端请求
+    setIsLoading(true)
+  
+    // 模拟后端延迟
     setTimeout(() => {
       const simulatedResponse = `重新生成的内容: ${selectedText} (模拟内容)`
       setNewGeneratedContent(simulatedResponse)
+      setIsLoading(false)
     }, 2000)
   }
 
@@ -75,17 +77,31 @@ export function GeneratedContent({ content, onContentChange }: GeneratedContentP
       setNewGeneratedContent(null)
     }
   }
+
+  const handleCancel = () => {
+    setContextMenuVisible(false)
+    setIsLoading(false)
+    setNewGeneratedContent(null)
+  }
+
+  const handleCopyGenerated = async () => {
+    if (newGeneratedContent) {
+      await navigator.clipboard.writeText(newGeneratedContent)
+    }
+  }
   
   useEffect(() => {
     const handleClickOutside = () => {
-      setContextMenuVisible(false)
+      if (!isLoading && !newGeneratedContent) {
+        setContextMenuVisible(false)
+      }
     }
   
     document.addEventListener('click', handleClickOutside)
     return () => {
       document.removeEventListener('click', handleClickOutside)
     }
-  }, [])
+  }, [isLoading, newGeneratedContent])
 
   return (
     <ContextMenu>
@@ -129,44 +145,60 @@ export function GeneratedContent({ content, onContentChange }: GeneratedContentP
         </div>
       </ContextMenuTrigger>
 
-      {contextMenuVisible && menuPosition && (
-        <>
-          {/* Debug red dot */}
-          {/* <div
-            style={{
-              position: 'absolute',
-              top: `${menuPosition.y+5}px`,
-              left: `${menuPosition.x-800}px`,
-              width: '6px',
-              height: '6px',
-              backgroundColor: 'red',
-              borderRadius: '50%',
-              zIndex: 9999,
-            }}
-          /> */}
-          <div
-            // className="absolut"
-            style={{ 
-              position: 'absolute',
-              top: `${menuPosition.y+5}px`, 
-              left: `${menuPosition.x-800}px` 
-            }}
-            className="absolute rounded-md border border-gray-200 shadow-sm"
-          >
+      {menuPosition && (
+        <div
+          style={{
+            position: 'absolute',
+            top: `${menuPosition.y + 5}px`,
+            left: `${menuPosition.x - 800}px`,
+            minWidth: '160px',
+            maxWidth: '400px',
+          }}
+          className="rounded-md border border-gray-200 shadow-sm p-3 z-50 bg-white dark:bg-[#3A3A3A] text-sm"
+        >
+          {isLoading ? (
+            <div className="text-gray-500 dark:text-gray-300 animate-pulse">生成中...</div>
+          ) : newGeneratedContent ? (
+            <div className="whitespace-pre-wrap text-gray-800 dark:text-gray-200 relative">
+              {/* 右上角复制按钮 */}
+              <button
+                onClick={handleCopyGenerated}
+                className="absolute top-1 right-1 text-xs text-gray-400 hover:text-gray-600 dark:hover:text-white"
+                title="复制"
+              >
+                <Copy className="w-4 h-4" />
+              </button>
+
+              {/* 显示生成内容 */}
+              <div className="pr-6">{newGeneratedContent}</div>
+
+              {/* 底部按钮区域 */}
+              <div className="flex justify-end gap-2 mt-3">
+                <button
+                  onClick={handleCancel}
+                  className="text-xs px-2 py-1 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 rounded"
+                >
+                  取消
+                </button>
+                <button
+                  onClick={() => {
+                    handleReplaceContent()
+                    setContextMenuVisible(false)
+                  }}
+                  className="text-xs px-2 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded"
+                >
+                  替换原内容
+                </button>
+              </div>
+            </div>
+          ) : (
             <button 
               onClick={handleRegenerate}
               className="relative flex cursor-default select-none items-center rounded-md px-4 py-2 text-sm outline-none bg-white text-gray-800 m-[2px] transition-colors duration-200 hover:bg-slate-100"
             >
               <span className="relative z-10">重新生成</span>
             </button>
-          </div>
-        </>
-      )}
-      
-      {newGeneratedContent && (
-        <div className="p-4 text-sm text-blue-500">
-          <p>{newGeneratedContent}</p>
-          <button onClick={handleReplaceContent} className="text-blue-600 underline">替换原内容</button>
+          )}
         </div>
       )}
     </ContextMenu>
